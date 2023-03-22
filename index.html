@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="icon" href="#">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.4/socket.io.js" integrity="sha512-aMGMvNYu8Ue4G+fHa359jcPb1u+ytAF+P2SCb+PxrjCdO3n3ZTxJ30zuH39rimUggmTwmh2u7wvQsDTHESnmfQ==" crossorigin="anonymous"></script>
+
+    <!-- linking Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <!-- linking style sheet -->
+    <link rel="stylesheet" type="text/css" href='card_style_1.css'>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
+    <script src="https://cdn.socket.io/3.1.3/socket.io.min.js"></script>
+
+</head>
+       
+                    <!-- """"""""""""""""""""""" SCRIPT SECTION  """""""""""""""""""""""""-->
+
+<script>
+
+var id_gl = ""
+var name_gl = ""
+var quote_gl = ""
+var pic_link = ''
+var submit_attendance_press = 0
+
+window.onload = function() {
+    
+    if (Cookies.get('logged_in') !== 'True') {        
+        window.location.href = 'https://192.168.1.158:8088/';
+    }
+    
+    const socket1 = io('https://192.168.1.158:8853');
+    const socket2 = io('https://192.168.1.158:8854');
+    const socket3 = io('https://192.168.1.158:8855');
+
+    const id_atd_btn = document.getElementById("id_attend_button");
+    const submit_dyn_atd_btn = document.getElementById("btn_submit_face");
+    const not_me_btn = document.getElementById("not_me_dyn_attend");
+    const cancel_id_atd_btn = document.getElementById("cancel_id_attend");
+    const cancel_dyn_atd_btn = document.getElementById("cancel_dyn_attend");
+    const submit_id_atd_btn = document.getElementById("btn_submit_id");
+    const employee_id_input = document.getElementById('emplyee_id_input');
+    const camera_id = Cookies.get('camera_id')    
+
+    socket1.on('connect', () => {
+        const JSON_Dict = {'camera_id': camera_id}
+        socket1.emit('camera_share_id', JSON.stringify(JSON_Dict));
+        console.log("Socket1 Connected!");
+    });
+
+    socket2.on('connect', () => {
+        console.log("Socket2 Connected!");
+    });
+
+    socket3.on('connect', () => {
+        console.log("Socket3 Connected!");
+    });
+    
+    // socket 1
+    socket1.on('detection_response', (data) => {
+        var J_dict = JSON.parse(data);
+        response_gl = J_dict.response;
+        id_gl = J_dict.id;
+        name_gl = J_dict.name;
+        quote_gl = J_dict.quote;
+        camera_id_gl = J_dict.camera_id;
+        pic_link  = '/ImagesAttendance/' + id_gl + '.png';       
+        console.log("Socket 1 received message: " + data);
+
+        if (camera_id_gl ==  camera_id) {
+
+            if(response_gl == '1'){
+                document.getElementById('id_attend_button').style.display = ''
+                document.getElementById('prfl_name').textContent = name_gl
+                document.getElementById('quote').textContent = quote_gl
+                document.getElementById('profile_img_dynamic').src = pic_link
+                document.getElementById('dynamic_attendance').style.display = 'block'
+                if (sleep_flag == 0) {
+                    var_fifteen_sec_timeout = setTimeout(fifteen_seconds_timout , 20000)
+                    console.log('timeout created dynamic attend')
+                    sleep_flag = 1
+                }
+            }
+
+            if(response_gl == '2'){
+                document.getElementById('prfl_name').textContent = name_gl
+                document.getElementById('quote').textContent = quote_gl
+                document.getElementById('profile_img_dynamic').src = pic_link
+                document.getElementById('warning_id_attendance').style.display = ''
+                document.getElementById('id_attendance').style.display = ''
+                document.getElementById('static_attendance').style.display = ''
+                document.getElementById('dynamic_attendance').style.display = 'block';
+                if (sleep_flag == 0) {
+                    var_fifteen_sec_timeout = setTimeout(fifteen_seconds_timout , 20000)
+                    console.log('timeout created dynamic attend')
+                    sleep_flag = 1
+                }
+            }
+        }
+    });   
+
+    // socket 2
+    id_atd_btn.addEventListener("click", () => {
+        const JSON_Dict = {'key_pressed': 'id_attendance_pressed', 'camera_id': camera_id}
+        socket2.emit('website_functions', JSON.stringify(JSON_Dict));
+    });
+    
+    submit_dyn_atd_btn.addEventListener("click", () => {
+        const JSON_Dict = {'key_pressed': 'confirm_dynamic_attendance', 'camera_id': camera_id}
+        socket2.emit('website_functions', JSON.stringify(JSON_Dict));
+    });
+
+    not_me_btn.addEventListener("click", () => {
+        const JSON_Dict = {'key_pressed': 'not_me_pressed', 'camera_id': camera_id}
+        socket2.emit('website_functions', JSON.stringify(JSON_Dict));
+    });
+    socket2
+    cancel_id_atd_btn.addEventListener("click", () => {
+        const JSON_Dict = {'key_pressed': 'cancel_id_attend_pressed', 'camera_id': camera_id}
+        socket2.emit('website_functions', JSON.stringify(JSON_Dict));
+    });
+
+    cancel_dyn_atd_btn.addEventListener("click", () => {
+        const JSON_Dict = {'key_pressed': 'cancel_dyn_att_pressed', 'camera_id': camera_id}
+        socket2.emit('website_functions', JSON.stringify(JSON_Dict));
+    });
+
+    submit_id_atd_btn.addEventListener("click", () => {
+            const JSON_Dict = {'submit_ID_attendance_pressed': employee_id_input.value, 'camera_id': camera_id}
+            socket2.emit('website_functions', JSON.stringify(JSON_Dict));
+            employee_id_input.value = '';
+        });
+
+    socket2.on('error_response', (data) => {
+        var J_dict = JSON.parse(data);
+        response_gl = J_dict.response;
+        camera_id_gl = J_dict.camera_id;
+        console.log("Socket2 received message: " + data);
+
+        if (camera_id_gl == camera_id) {
+
+            if(response_gl == '3'){
+                var_fifteen_sec_timeout = setTimeout( fifteen_seconds_timout ,20000);
+                document.getElementById('warning_id_attendance').textContent = 'ID does not exist'
+                document.getElementById('warning_id_attendance').style.display = 'block'
+                submit_attendance_press = 0
+            }
+            
+            if(response_gl == '4'){
+                var_fifteen_sec_timeout = setTimeout( fifteen_seconds_timout ,20000);
+                document.getElementById('warning_id_attendance').textContent = 'Please enter a valid ID'
+                document.getElementById('warning_id_attendance').style.display = 'block'
+                submit_attendance_press = 0
+            }
+        }
+    });   
+
+    // socket 3
+    socket3.binaryType = "arraybuffer";
+    socket3.on('video_feed', (data) => {
+	 var J_dict = JSON.parse(data);
+	 var camera_feed = J_dict[camera_id];
+	 var arrayBuffer = Uint8Array.from(atob(camera_feed), c => c.charCodeAt(0)).buffer;
+	 const blob = new Blob([arrayBuffer], { type: "image/jpeg" });
+ 	 const urlCreator = window.URL || window.webkitURL;
+	 const imageUrl = urlCreator.createObjectURL(blob);
+	 const canvas = document.getElementById("videoCanvas");
+	 const ctx = canvas.getContext("2d");
+	 const img = new Image();
+	 img.onload = function () {
+	    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    	 URL.revokeObjectURL(imageUrl); 
+         };
+     img.src = imageUrl;
+   });
+
+}
+</script>
+
+<body>
+
+<script type="text/javascript" charset="utf-8">
+
+var sleep_flag = 0
+var var_fifteen_sec_timeout = 0
+
+// ID Attendance Button
+// Objective: Show ID Attendance Card
+function show_id_attendance(){
+
+    sleep_flag = 0
+    clearTimeout(var_fifteen_sec_timeout)
+    console.log('timeout cleared for id Attend_both cleared')
+
+    document.getElementById('id_attendance').style.display = 'block'
+    document.getElementById('emplyee_id_input').value = ''
+    document.getElementById('dynamic_attendance').style.display = ''
+    document.getElementById('static_attendance').style.display = ''
+
+    // reset warnings element inside id_attendance
+    document.getElementById('warning_id_attendance').style.display = ''
+    document.getElementById('id_attend_button').style.display = ''
+
+    var_fifteen_sec_timeout = setTimeout(fifteen_seconds_timout , 20000);
+    console.log('timeout created for show id attendance')
+
+}
+
+// Cancel Buttons
+// Hides ID Attendance, Dynamic and Static Attedance (used when clicking cancel buttons)
+function hide_id_attendance(){
+    sleep_flag = 0
+    document.getElementById('id_attendance').style.display = ''
+    document.getElementById('dynamic_attendance').style.display = ''
+    document.getElementById('static_attendance').style.display = ''
+    document.getElementById('id_attend_button').style.display = 'block'
+    clearTimeout(var_fifteen_sec_timeout)
+    console.log('timeout cleared hide id attendace')
+
+}
+
+// Submit Dynamic Attendance Button
+// Objective: Submits Dynamic Attendance and hides it, then shows Static Attendance for 2 seconds and hides it.
+function submit_click_dyn_attendance(){
+    sleep_flag = 0
+    clearTimeout(var_fifteen_sec_timeout)
+    console.log('timeout cleared')
+
+    // hide dynamic attendance
+    document.getElementById('dynamic_attendance').style.display = ''
+
+    // configure static attendance
+    document.getElementById('prfl_name_static').textContent = name_gl
+    document.getElementById('quote_static').textContent = quote_gl
+    document.getElementById('profile_img_static').src = '/ImagesAttendance/' + id_gl + '.png'
+
+    // show static attendance
+    document.getElementById('static_attendance').style.display = 'block'
+
+    // hide static attendance after 2 sec
+    setTimeout(function(){
+    document.getElementById('static_attendance').style.display = ''
+    document.getElementById('id_attend_button').style.display = 'block'
+    }, 2000);
+    };
+
+// changes variable when submit id attendance is activated
+function submit_attendance_press_func() {
+    submit_attendance_press = 1
+    sleep_flag = 0
+    clearTimeout(var_fifteen_sec_timeout)
+}
+
+// Reset system if nothing happens for 15 seconds
+function fifteen_seconds_timout() {
+
+            if((document.getElementById('dynamic_attendance').style.display == 'block') || (document.getElementById('id_attendance').style.display == 'block')){
+                document.getElementById("cancel_dyn_attend").click()
+                // document.getElementById("cancel_id_attend").click()
+                sleep_flag = 0
+                document.getElementById('warning_face_attendance').textContent = 'Operation Cancled, Please try again!'
+                document.getElementById('warning_face_attendance').style.display = 'block'
+                setTimeout( function()  {
+                document.getElementById('warning_face_attendance').style.display = ''
+                document.getElementById('warning_face_attendance').textContent = ''
+                },2250)
+            }
+        };
+
+</script>
+
+        <!-- """"""""""""""""""""""" HTML SECTION  """""""""""""""""""""""""-->
+
+    <!-- This container has the video feed card -->
+    <div class="container" id="video_feed">
+        <!-- Display warnings at specific scenarios -->
+        <div id="warning_face_attendance" class="alert alert-warning">
+        </div>
+            <!-- Video feed section -->
+            <div class="col-lg-12">
+                <canvas id="videoCanvas" width="640" height="360" style="margin-top: 7%; margin-bottom: 7%" >
+            </div>
+            
+                <input  id="id_attend_button" type="submit" value="ID Attendance" name="id_attendance__" onclick="show_id_attendance()"/>
+    </div>
+
+    <!-- This container has the dynamic attendance card -->
+    <div class="container" id="dynamic_attendance">
+        <!-- This section is for the cover photo, name, and quote -->
+        <div class="cover-photo"><img class="profile"  id="profile_img_dynamic"/></div>
+        <div class="profile-name" id="prfl_name">""</div>
+        <p class="about" id="quote">""</p>
+
+        <!-- This is the submit button for confirming the attendance and submitting the form -->
+        <input class="btn_submit" id="btn_submit_face" type="submit" value="Confirm" name="success_attended" onclick="submit_click_dyn_attendance()"/>
+
+        <!-- This button will take you to the ID Attendance Card -->
+        <input class="secondary-btn" id="not_me_dyn_attend" name = 'not_me' type="submit" onclick="show_id_attendance()" value="Not Me?"/>
+
+        <!-- This button will hide the Dynamic Attendance Card -->
+        <input class="secondary-btn" id="cancel_dyn_attend" name="cancel__" type="submit" onclick="hide_id_attendance()" value="Cancel"/>
+
+    </div>
+
+    <!-- This container has the static attendance card -->
+    <div class="container" id="static_attendance">
+        <!-- This section is for the cover photo, name, and quote -->
+        <div class="cover-photo"><img class="profile" id="profile_img_static"/></div>
+        <div class="profile-name", id="prfl_name_static"></div>
+        <p class="about" id="quote_static"></p>
+    </div>
+
+
+    <!-- This container has the id attendance card -->
+    <div class="container", id="id_attendance">
+        <h6 class="fs-subtitle">ID Attendance</h6>
+            <h6 class="fs-subtitle" style="font-size:small">Please enter your employee ID:</h6>
+            <!-- This section has an input field, submit button, and warning messages -->
+                <!-- This is the warning button -->
+                <div id="warning_id_attendance" class="alert alert-danger"></div>
+
+                <!-- This is the input field for users -->
+                <div>
+                    <input type="text" name="employee_id" id="emplyee_id_input" value = ""/>
+                </div>
+
+                <!-- This is the submit button for the id attendance form  -->
+                <div>
+                    <input class="btn_submit" id="btn_submit_id" type="submit" value="Submit" name="success_attended" onclick="submit_attendance_press_func()"/>
+                </div>
+            <!-- This is the cancle button for id attendance -->
+            <input class="secondary-btn" id="cancel_id_attend" name ="cancel2__" type="submit" onclick="hide_id_attendance()" value="Cancel"/>
+    </div>
+
+</body>
+</html>
