@@ -1,0 +1,10 @@
+OWASP:
+https://owasp.org/www-project-cloud-native-application-security-top-10/ 
+https://owasp.org/www-project-top-ten/ 
+https://owasp.org/www-project-application-security-verification-standard
+https://github.com/OWASP/ASVS
+SANS:
+https://www.sans.org/top25-software-errors/  
+SAFEcode:
+https://safecode.org
+https://safecode.org/wp-content/uploads/2018/03/SAFECode_Fundamental_Practices_for_Secure_Software_Development_March_2018.pdf
