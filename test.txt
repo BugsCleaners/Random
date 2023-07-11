@@ -8,3 +8,6 @@ https://www.sans.org/top25-software-errors/
 SAFEcode:
 https://safecode.org
 https://safecode.org/wp-content/uploads/2018/03/SAFECode_Fundamental_Practices_for_Secure_Software_Development_March_2018.pdf
+https://tryhackme.com/room/whatsphishingroomabyf
+https://tryhackme.com/room/linuxforensicsabroomzu
+https://tryhackme.com/room/redtestabroomux
