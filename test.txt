@@ -1,6 +1,4 @@
 https://teams.microsoft.com/dl/launcher/launcher.html?url=%2F_%23%2Fl%2Fmeetup-join%2F19%3Ameeting_OWRmODU3ZjQtYTQyMC00M2Q5LTg1NmUtYmYyZWNmZDBiMmZk%40thread.v2%2F0%3Fcontext%3D%257b%2522Tid%2522%253a%2522c8b57262-b1dd-4703-8739-6519b27b0a03%2522%252c%2522Oid%2522%253a%25221e413d22-ad91-43da-9c63-88f77d93b66f%2522%257d%26anon%3Dtrue&type=meetup-join&deeplinkId=75bf5e05-7ad3-4bd2-986c-8d962c7057a0&directDl=true&msLaunch=true&enableMobilePage=true&suppressPrompt=true
 
 
-https://tryhackme.com/client/6231e9c38a427e0041ad66b6/path/join?code=hdazwx0zi5
-
 
